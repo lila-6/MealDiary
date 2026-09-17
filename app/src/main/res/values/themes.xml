@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 三餐打卡主题：绿色系为主色，象征健康饮食 -->
+    <style name="Theme.MealDiary" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <!-- 主色：健康绿 -->
+        <item name="colorPrimary">#4CAF50</item>
+        <item name="colorPrimaryVariant">#388E3C</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <!-- 辅助色 -->
+        <item name="colorSecondary">#FF9800</item>
+        <item name="colorSecondaryVariant">#F57C00</item>
+        <item name="colorOnSecondary">#FFFFFF</item>
+        <!-- 背景色 -->
+        <item name="android:colorBackground">#F5F5F5</item>
+        <item name="colorSurface">#FFFFFF</item>
+    </style>
+
+    <!-- 日历控件样式 -->
+    <style name="CalendarHeaderText">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">#333333</item>
+    </style>
+
+    <style name="CalendarWeekDayText">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">#666666</item>
+    </style>
+
+    <style name="CalendarDateText">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">#333333</item>
+    </style>
+</resources>

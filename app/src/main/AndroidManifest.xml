@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- ===== 权限声明===== -->
+    <!-- 声明使用相机硬件，但不是必须的（required=false），没有相机的设备也能安装 -->
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
+    <!-- 网络访问权限：访问网络和检查网络状态 -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- 相机权限：调用系统相机拍照 -->
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <!-- 录音权限：使用 MediaRecorder 录制音频 -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+    <!-- 前台服务权限：SyncService 需要以通知栏常驻形式在后台运行 -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+    <!-- 通知权限：Android 13+ 发送通知需要动态申请 -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- 读取外部存储权限：选择图片时需要（API 32 以下需要） -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <!-- 精确闹钟权限：Android 12+ 确保三餐提醒能准时触发 -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.MealDiary"
+        android:usesCleartextTraffic="true">
+        <!-- 登录页 → 设为启动页 -->
+        <activity
+            android:name=".ui.login.LoginActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- 注册页 -->
+        <activity
+            android:name=".ui.login.RegisterActivity"
+            android:exported="false" />
+
+        <!-- 主界面（原启动页） -->
+        <activity
+            android:name=".ui.MainActivity"
+            android:exported="false" />
+
+        <!-- 添加三餐 -->
+        <activity
+            android:name=".ui.diary.AddMealActivity"
+            android:exported="false" />
+
+        <!-- 记录详情 — 从饮食列表点击某条记录跳转 -->
+        <activity
+            android:name=".ui.diary.DetailActivity"
+            android:exported="false" />
+
+        <!-- 编辑个人信息 — 从"我的"页面点击入口跳转-->
+        <activity
+            android:name=".ui.profile.EditProfileActivity"
+            android:exported="false" />
+
+        <!--  摇一摇随机选餐 — 从首页卡片点击跳转,从"我的"页面点击入口跳转-->
+        <activity
+            android:name=".ui.shake.ShakePickActivity"
+            android:exported="false" />
+
+        <!-- 账号安全页面 -->
+        <activity
+            android:name=".ui.profile.AccountSecurityActivity"
+            android:exported="false" />
+
+        <!-- ================ Service 声明（1个）=======================-->
+        <!--
+       后台同步服务 — 由 NetworkChangeReceiver 或 MainActivity 启动
+       显式启动：Intent(this, SyncService.class)
+       foregroundServiceType="dataSync"：声明为数据同步类型的前台服务
+       exported=false：仅应用内部使用-->
+        <service
+            android:name=".service.SyncService"
+            android:foregroundServiceType="dataSync"
+            android:exported="false"
+            tools:ignore="ForegroundServicePermission" />
+        <!-- ================ Service 声明（1个）=======================-->
+
+
+        <!--
+        ===============
+        BroadcastReceiver 声明（2个静态注册 + 2个动态注册）
+        静态注册（在清单文件中声明，系统自动管理）：
+      - NetworkChangeReceiver：监听网络变化，触发同步。基本没用。Android 7.0+ 系统不发了
+      - MealReminderReceiver：接收闹钟广播，发送用餐提醒
+
+         动态注册（在 MainActivity 中用代码注册，运行时生效）：
+      - 网络监听 Receiver：MainActivity 中动态注册，绕过 Android 7.0+ 限制。真正的网络监听
+      - Tab切换 Receiver：接收 SWITCH_TO_DIARY 广播，
+      切换 Tab.MainActivity 里动态注册的 Receiver .Tab切换广播是在 HomeFragment 里发送的
+        ================ -->
+            <!--===基本没用。Android 7.0+ 系统不发了
+                网络变化监听 — 注册在清单文件中
+                隐式启动：系统发送 CONNECTIVITY_CHANGE 广播时自动触发
+                功能：检测到网络可用时启动 SyncService 进行数据同步 -->
+        <receiver
+            android:name=".service.NetworkChangeReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
+
+        <!--
+        三餐提醒闹钟接收器 — 由 AlarmManager 触发
+         隐式启动：系统闹钟到时间后发送广播，此 Receiver 自动接收
+         功能：收到广播后发送通知提醒用户用餐 -->
+        <receiver
+            android:name=".service.MealReminderReceiver"
+            android:exported="false" />
+        <!-- ===============BroadcastReceiver 声明（3个）================ -->
+
+        <!-- ===============ContentProvider 声明（1个）  ================ -->
+        <!--
+           饮食数据共享 — 向外部应用暴露饮食记录查询接口
+           显式启动：外部应用通过 ContentResolver.query(URI) 访问
+           隐式启动：系统通过 authorities 匹配 URI 找到此 Provider
+           exported=true：允许外部应用访问（这是 ContentProvider 的核心特性）
+           authorities="com.example.mealdiary.provider"：URI 权限标识
+       -->
+        <provider
+            android:name=".provider.DietProvider"
+            android:authorities="com.example.mealdiary.provider"
+            android:exported="true" />
+
+        <!--
+            FileProvider — 拍照时生成临时 URI，供系统相机访问
+            显式启动：代码中通过 FileProvider.getUriForFile() 获取 URI
+            authorities="com.example.mealdiary.fileprovider"：与代码中的字符串一致
+            exported=false：不需要外部访问
+        -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.example.mealdiary.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+        <!-- ===============ContentProvider 声明（1个）  ================ -->
+
+    </application>
+</manifest>

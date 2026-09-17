@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 账号安全页面布局 -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F5F5F5">
+
+    <!-- ===== 页面标题 ===== -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="账号安全"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="#333"
+        android:gravity="center"
+        android:paddingVertical="16dp"
+        android:background="#FFFFFF" />
+
+    <!-- ===== 功能列表 ===== -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#FFFFFF"
+        android:paddingHorizontal="16dp">
+
+        <!-- 手机号绑定 -->
+        <LinearLayout
+            android:id="@+id/itemBindPhone"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:clickable="true"
+            android:foreground="?attr/selectableItemBackground">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="手机号绑定"
+                android:textSize="16sp"
+                android:textColor="#333" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="未绑定 >"
+                android:textSize="13sp"
+                android:textColor="#999" />
+        </LinearLayout>
+
+        <View android:layout_width="match_parent" android:layout_height="0.5dp" android:background="#EEE" />
+
+        <!-- 账户注销 -->
+        <LinearLayout
+            android:id="@+id/itemDeleteAccount"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:clickable="true"
+            android:foreground="?attr/selectableItemBackground">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="账户注销"
+                android:textSize="16sp"
+                android:textColor="#FF6B6B" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

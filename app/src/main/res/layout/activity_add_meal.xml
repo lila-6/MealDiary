@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
+        <!-- 目标日期显示 -->
+        <TextView
+            android:id="@+id/tvTargetDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="记录日期：今天"
+            android:textSize="14sp"
+            android:textColor="#888"
+            android:gravity="center"
+            android:layout_marginBottom="8dp" />
+
+        <!-- 三餐类型下拉 -->
+        <Spinner
+            android:id="@+id/spinnerMealType"
+            android:layout_width="match_parent"
+            android:layout_height="48dp" />
+
+        <!-- 食物名称 -->
+        <EditText
+            android:id="@+id/etFoodName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="食物名称"
+            android:layout_marginTop="8dp" />
+
+        <!-- 选图片按钮 -->
+        <Button
+            android:id="@+id/btnPickImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="选择图片"
+            android:layout_marginTop="8dp" />
+
+        <!-- 图片预览 -->
+        <ImageView
+            android:id="@+id/ivPreview"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:scaleType="centerCrop"
+            android:background="#eee"
+            android:layout_marginTop="8dp" />
+
+        <!-- 录音按钮 -->
+        <Button
+            android:id="@+id/btnRecord"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="录音"
+            android:layout_marginTop="8dp" />
+
+        <!-- 播放录音按钮 -->
+        <Button
+            android:id="@+id/btnPlay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="播放录音" />
+
+        <!-- 备注 -->
+        <EditText
+            android:id="@+id/etNote"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:hint="备注（可选）"
+            android:gravity="top"
+            android:inputType="textMultiLine"
+            android:layout_marginTop="8dp" />
+
+        <!-- 保存按钮 -->
+        <Button
+            android:id="@+id/btnSave"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="保存"
+            android:layout_marginTop="16dp" />
+    </LinearLayout>
+</ScrollView>
