@@ -74,6 +74,8 @@ MealDiary/
 | `sync_status` | INT | 同步状态（0=未同步，1=已同步） |
 
 ### 建表 SQL
+
+```sql
 CREATE TABLE diet_record (
     id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '主键ID',
     user_id BIGINT NOT NULL COMMENT '用户ID',
@@ -85,16 +87,22 @@ CREATE TABLE diet_record (
     create_time DATETIME COMMENT '创建时间',
     sync_status INT DEFAULT 0 COMMENT '同步状态：0未同步，1已同步'
 ) COMMENT '饮食记录表';
-说明： 用户数据由 Android 客户端本地 Room 数据库管理，后端不存储 App 用户信息。若依自带的 sys_user 表仅用于后台管理系统。
+```
+
+**说明：** 用户数据由 Android 客户端本地 Room 数据库管理，后端不存储 App 用户信息。若依自带的 `sys_user` 表仅用于后台管理系统。
 
 ## 四、接口文档
-基础路径:所有接口以 /diet/record 为前缀。若依默认运行在 80 端口。
 
-### 接口1：上传饮食记录
-请求：POST /diet/record/add
-Content-Type: application/json
+基础路径：所有接口以 `/diet/record` 为前缀。若依默认运行在 80 端口。
+
+### 接口 1：上传饮食记录
+
+- 请求：`POST /diet/record/add`
+- Content-Type：`application/json`
+
 请求体：
-json
+
+```json
 {
   "userId": 1,
   "mealType": "breakfast",
@@ -105,17 +113,23 @@ json
   "createTime": "2026-05-19 12:00:00",
   "syncStatus": 1
 }
+```
+
 返回：
-json
+
+```json
 {
   "code": 200,
   "msg": "操作成功"
 }
+```
 
-### 接口2：查询饮食记录列表
-请求：POST /diet/record/list
-返回： 分页数据
-json
+### 接口 2：查询饮食记录列表
+
+- 请求：`POST /diet/record/list`
+- 返回：分页数据
+
+```json
 {
   "total": 10,
   "rows": [
@@ -128,10 +142,12 @@ json
     }
   ]
 }
+```
 
-### 接口3：删除饮食记录
-请求：POST /diet/record/remove
-参数：ids=1,2,3
+### 接口 3：删除饮食记录
+
+- 请求：`POST /diet/record/remove`
+- 参数：`ids=1,2,3`
 
 ## 五、部署步骤
 1. 环境准备

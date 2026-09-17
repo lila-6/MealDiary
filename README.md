@@ -126,23 +126,33 @@ MealDiary/
 ## 七、核心难点与解决方案
 
 ### 1. Room 禁止主线程访问数据库
+
 **问题：** 主线程直接操作 Room 抛 `IllegalStateException`。
+
 **解决：** 所有数据库操作放入 `new Thread()` 或 `ExecutorService`，通过 `Handler(Looper.getMainLooper())` 或 `runOnUiThread()` 切回主线程更新 UI。
 
 ### 2. ViewPager2 中 Fragment 生命周期冲突
+
 **问题：** ViewPager2 滑动导致 Fragment 频繁 `onDestroy`，线程池被提前关闭，抛 `RejectedExecutionException`。
+
 **解决：** Fragment 中弃用 `ExecutorService`，改用 `new Thread()`，不受生命周期管理影响。
 
 ### 3. HTTP 明文请求被禁止
+
 **问题：** Android 9+ 默认禁止 HTTP 明文传输。
+
 **解决：** 在 `AndroidManifest.xml` 中声明 `android:usesCleartextTraffic="true"`，仅用于开发调试。
 
 ### 4. 多用户数据隔离
+
 **问题：** 切换账号后，新账号显示旧账号的个人信息。
+
 **解决：** SharedPreferences 的 Key 从固定字符串改为 `userId + "_nickname"` 格式。
 
 ### 5. 账户注销需彻底清除数据
+
 **问题：** 注销只清除登录状态，数据残留。
+
 **解决：** 依次删除饮食记录、用户账号、SharedPreferences 数据，所有操作在同一后台线程顺序执行。
 
 ---
