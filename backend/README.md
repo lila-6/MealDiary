@@ -20,6 +20,8 @@
 ## 二、目录结构
 
 本目录只包含自定义开发的核心文件，部署时需放入若依项目对应位置。
+
+```text
 MealDiary/
 └── backend/
     ├── README.md
@@ -51,6 +53,7 @@ MealDiary/
                         ├── add.html
                         ├── edit.html
                         └── record.html
+```
 
 ---
 
@@ -166,13 +169,13 @@ ruoyi-admin/src/main/resources/templates/diet/
 执行 sql/menu.sql，在若依后台"系统工具 → 饮食记录"中可查看同步数据。
 
 ## 六、关键改造说明
-基于若依代码生成器生成的基础代码，做了以下修改：
-修改文件	修改内容	原因
-DietRecordController.java	添加 @Anonymous 注解	允许 App 匿名访问，无需登录
-DietRecordController.java	删除所有 @RequiresPermissions 注解	避免权限拦截
-DietRecordController.java	addSave 方法改为接收 Map<String, Object>	处理 App 传来的字符串时间格式
-application-druid.yml	修改数据库账号密码	适配本地环境
-application.yml	调整 mapperLocations 路径	匹配 XML 文件位置
+| 修改文件 | 修改内容 | 原因 |
+|----------|----------|------|
+| `DietRecordController.java` | 添加 `@Anonymous` 注解 | 允许 App 匿名访问，无需登录 |
+| `DietRecordController.java` | 删除所有 `@RequiresPermissions` 注解 | 避免权限拦截 |
+| `DietRecordController.java` | addSave 方法改为接收 `Map<String, Object>` | 处理 App 传来的字符串时间格式 |
+| `application-druid.yml` | 修改数据库账号密码 | 适配本地环境 |
+| `application.yml` | 调整 mapperLocations 路径 | 匹配 XML 文件位置 |
 
 
 ## 七、注意事项
