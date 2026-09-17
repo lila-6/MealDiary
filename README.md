@@ -39,6 +39,7 @@
 ---
 
 ## 三、项目结构
+````text
 MealDiary/
 ├── app/                                # Android 客户端
 │   └── src/main/java/com/example/mealdiary/
@@ -66,7 +67,7 @@ MealDiary/
     ├── README.md
     ├── sql/
     └── src/
-
+````
 ---
 
 ## 四、四大组件运用
