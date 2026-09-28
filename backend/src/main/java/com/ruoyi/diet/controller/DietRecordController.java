@@ -25,6 +25,11 @@ import com.ruoyi.common.core.page.TableDataInfo;
  * @author ruoyi
  * @date 2026-05-15
  */
+import com.ruoyi.common.annotation.Anonymous;
+import java.util.Map;
+import org.springframework.web.bind.annotation.RequestBody;
+import java.text.SimpleDateFormat;
+@Anonymous
 @Controller
 @RequestMapping("/diet/record")
 public class DietRecordController extends BaseController
@@ -34,7 +39,7 @@ public class DietRecordController extends BaseController
     @Autowired
     private IDietRecordService dietRecordService;
 
-    @RequiresPermissions("diet:record:view")
+
     @GetMapping()
     public String record()
     {
@@ -44,7 +49,7 @@ public class DietRecordController extends BaseController
     /**
      * 查询饮食记录列表
      */
-    @RequiresPermissions("diet:record:list")
+
     @PostMapping("/list")
     @ResponseBody
     public TableDataInfo list(DietRecord dietRecord)
@@ -57,7 +62,7 @@ public class DietRecordController extends BaseController
     /**
      * 导出饮食记录列表
      */
-    @RequiresPermissions("diet:record:export")
+
     @Log(title = "饮食记录", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     @ResponseBody
@@ -71,7 +76,7 @@ public class DietRecordController extends BaseController
     /**
      * 新增饮食记录
      */
-    @RequiresPermissions("diet:record:add")
+
     @GetMapping("/add")
     public String add()
     {
@@ -81,19 +86,40 @@ public class DietRecordController extends BaseController
     /**
      * 新增保存饮食记录
      */
-    @RequiresPermissions("diet:record:add")
+
     @Log(title = "饮食记录", businessType = BusinessType.INSERT)
     @PostMapping("/add")
     @ResponseBody
-    public AjaxResult addSave(DietRecord dietRecord)
+    public AjaxResult addSave(@RequestBody Map<String, Object> params)
     {
+        DietRecord dietRecord = new DietRecord();
+        dietRecord.setUserId(Long.valueOf(params.get("userId").toString()));
+        dietRecord.setMealType((String) params.get("mealType"));
+        dietRecord.setFoodName((String) params.get("foodName"));
+        dietRecord.setImagePath((String) params.get("imagePath"));
+        dietRecord.setAudioPath((String) params.get("audioPath"));
+        dietRecord.setNote((String) params.get("note"));
+
+        try {
+            String createTimeStr = (String) params.get("createTime");
+            if (createTimeStr != null) {
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                dietRecord.setCreateTime(sdf.parse(createTimeStr));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (params.get("syncStatus") != null) {
+            dietRecord.setSyncStatus(Long.valueOf(params.get("syncStatus").toString()));
+        }
+
         return toAjax(dietRecordService.insertDietRecord(dietRecord));
     }
-
     /**
      * 修改饮食记录
      */
-    @RequiresPermissions("diet:record:edit")
+
     @GetMapping("/edit/{id}")
     public String edit(@PathVariable("id") Long id, ModelMap mmap)
     {
@@ -105,7 +131,7 @@ public class DietRecordController extends BaseController
     /**
      * 修改保存饮食记录
      */
-    @RequiresPermissions("diet:record:edit")
+
     @Log(title = "饮食记录", businessType = BusinessType.UPDATE)
     @PostMapping("/edit")
     @ResponseBody
@@ -117,7 +143,7 @@ public class DietRecordController extends BaseController
     /**
      * 删除饮食记录
      */
-    @RequiresPermissions("diet:record:remove")
+
     @Log(title = "饮食记录", businessType = BusinessType.DELETE)
     @PostMapping( "/remove")
     @ResponseBody
