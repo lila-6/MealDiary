@@ -43,6 +43,7 @@
 MealDiary/
 ├── app/                                # Android 客户端
 │   └── src/main/java/com/example/mealdiary/
+│       ├── MealDiaryApplication.java   # 全局 Application，注册 NetworkCallback 监听网络
 │       ├── data/
 │       │   ├── local/                  # Room 数据库、SessionManager
 │       │   │   ├── entity/             # MealRecord、User
@@ -60,7 +61,7 @@ MealDiary/
 │       │   ├── message/
 │       │   ├── profile/
 │       │   └── shake/
-│       ├── service/                    # SyncService、广播接收器
+│       ├── service/                    # SyncService 前台同步服务、广播接收器
 │       └── provider/                   # DietProvider
 │
 └── backend/                            # 若依后端自定义模块
@@ -76,11 +77,11 @@ MealDiary/
 |------|--------|------|
 | **Activity** | 8 个 | 登录、注册、主界面、添加记录、详情、摇一摇、编辑资料、账号安全 |
 | **Service** | `SyncService` | 前台服务，后台将未同步记录上传到若依后端 |
-| **BroadcastReceiver** | `NetworkChangeReceiver` | 静态注册展示标准用法，监听网络变化触发同步 |
+| **BroadcastReceiver** | `NetworkChangeReceiver` | 静态注册展示标准用法（Android 7.0+ 系统限制，实际不生效） |
 | | `MealReminderReceiver` | 接收 AlarmManager 闹钟广播，弹出三餐提醒通知 |
-| | `MainActivity` 动态 Receiver | 绕过 Android 7.0+ 限制，实际监听网络变化 + 切换 Tab |
+| | `MainActivity` 动态 Receiver | 接收 `SWITCH_TO_DIARY` 广播，切换 ViewPager Tab |
 | **ContentProvider** | `DietProvider` | 向外部应用暴露饮食记录查询接口（query 方法） |
-
+| **Application** | `MealDiaryApplication` | 全局注册 `NetworkCallback`，网络恢复时触发 SyncService 同步 |
 ---
 
 ## 五、多种组件运用
@@ -155,6 +156,14 @@ MealDiary/
 
 **解决：** 依次删除饮食记录、用户账号、SharedPreferences 数据，所有操作在同一后台线程顺序执行。
 
+### 6. 网络恢复监听不稳定
+
+**问题：** 最初使用 `CONNECTIVITY_CHANGE` 广播监听网络变化，在手机上出现同步不触发的问题。经 Logcat 定位，`SyncService` 启动后仅存活 47ms 便调用 `stopSelf()` 退出，原因是广播触发瞬间网络尚未真正就绪，`getActiveNetworkInfo()` 返回 null，被网络检查逻辑拦截。同时，监听注册在 `MainActivity` 中，App 切后台后 Activity 销毁，监听随之失效。
+
+**解决：** 将网络监听上移到自定义的 `MealDiaryApplication`（全局单例，与 App 进程同生命周期），改用 `NetworkCallback.onAvailable()` 回调，只有网络真正可用时才触发 `SyncService`。同时移除 `SyncService` 内的网络预检查，改由 Retrofit 请求结果判断，失败时保留 `syncStatus=0`，待下次网络恢复重试。
+
+**收获：** 广播只能通知"网络状态发生了变化"，不保证"网络已经可用"；Activity 的生命周期不适合承载常驻监听。实际工程中应优先使用 `NetworkCallback`，并将常驻监听放在 `Application` 层。
+
 ---
 
 ## 八、运行说明
@@ -168,22 +177,21 @@ MealDiary/
 1. 克隆本项目到本地
 2. 用 Android Studio 打开项目根目录
 3. 等待 Gradle 同步完成
-4. 修改 `RetrofitClient.java` 中的 `BASE_URL` 为你的后端地址：
-   ```java
-   // 模拟器
-   private static final String BASE_URL = "http://10.0.2.2:80/";
-   // 真机（替换为电脑局域网IP）
-   private static final String BASE_URL = "http://192.168.x.x:x/";
-5. 手机和电脑连同一 WiFi（或手机开热点电脑连接）
-6. 启动若依后端（参考 backend/README.md）
-7. 运行 App 即可
+4. 在项目根目录的 `local.properties` 文件中配置后端地址：
+   ```properties
+   # 模拟器调试
+   BASE_URL=http://10.0.2.2/
+   # 真机调试（替换为电脑局域网 IP，手机和电脑需在同一 WiFi）
+   BASE_URL=http://192.xxx.x.x/
+5. 启动若依后端（参考 backend/README.md）
+6. 运行 App 即可
 
 ### 后端部署
 本项目后端基于若依（RuoYi）框架，部署说明见 backend/README.md。
 
 
 ## 九、注意事项
-1. 同步条件：手机和电脑需在同一网络下才能同步，因为后端部署在本地电脑
+1. 同步条件：手机和电脑需在同一网络下才能同步，因为后端部署在本地电脑；后端地址通过 `local.properties` 的 `BASE_URL` 配置
 2. 同步方向：当前为单向（客户端 → 后端），不支持云端数据回写
 3. 同步内容：仅同步文本字段（userId、mealType、foodName、createTime），图片和音频文件保留在本地
 4. 密码存储：实训版明文存储，正式环境应使用 MD5/SHA 加密
