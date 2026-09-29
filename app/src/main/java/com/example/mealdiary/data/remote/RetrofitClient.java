@@ -3,6 +3,7 @@ package com.example.mealdiary.data.remote;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+
 /**
  * Retrofit 网络客户端单例类（多种组件之：网络请求组件）
  *Retrofit 开源库提供的 API 接口
@@ -27,10 +28,10 @@ public class RetrofitClient {
     /**
      * 若依后端的访问地址
      * - 模拟器：http://10.0.2.2/ (Android 模拟器访问宿主机的特殊 IP)
-     * - 真机：请替换为你电脑的局域网 IP (如 http://192.168.x.x/)
+     * - 真机：请替换为你电脑的局域网 IP (如 http://192.xxx.x.x/)
      * 注意：必须与若依后端启动端口一致（本项目若依运行在 80 端口）
      */
-    private static final String BASE_URL = "http://10.0.2.2/"; // 模拟器示例地址
+    private static final String BASE_URL = com.example.mealdiary.BuildConfig.BASE_URL;
     // Retrofit 实例，全局唯一
     private static Retrofit retrofit;
     // ApiService 接口的实现类，Retrofit 自动生成

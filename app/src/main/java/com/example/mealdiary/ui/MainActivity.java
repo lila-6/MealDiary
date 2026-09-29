@@ -40,8 +40,7 @@ public class MainActivity extends AppCompatActivity {
     private ViewPager2 viewPager;
     // 底部导航栏
     private BottomNavigationView bottomNav;
-    // 网络监听广播接收器（成员变量，便于在 onDestroy 中注销）
-    BroadcastReceiver networkReceiver;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
 
         // ===== 底部导航栏点击事件 =====
         // 点击底部 Tab → ViewPager2 切换到对应页面
-        bottomNav.setOnNavigationItemSelectedListener(item -> {
+        bottomNav.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.nav_home) viewPager.setCurrentItem(0);       // 切换到首页
             else if (id == R.id.nav_diary) viewPager.setCurrentItem(1);  // 切换到饮食日记
@@ -114,35 +113,6 @@ public class MainActivity extends AppCompatActivity {
             startForegroundService(syncIntent);  // Android 8.0+ 必须用前台服务
         } else {
             startService(syncIntent);            // 低版本用普通服务
-        }
-
-        // ===== 广播接收器2：动态注册网络监听 =====
-        // 监听网络状态变化，当网络恢复时自动启动 SyncService
-        // 使用动态注册而非清单文件注册，是为了绕过 Android 7.0+ 对 CONNECTIVITY_CHANGE 的限制
-        //目的：手机网络状态变化时（WiFi连接/断开、移动数据开关）自动启动 SyncService
-        IntentFilter filter = new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE");
-        networkReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                Intent syncIntent2 = new Intent(MainActivity.this, com.example.mealdiary.service.SyncService.class);
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                    startForegroundService(syncIntent2);
-                } else {
-                    startService(syncIntent2);
-                }
-            }
-        };
-        registerReceiver(networkReceiver, filter);
-    }
-
-    /**
-     * Activity 销毁时注销动态注册的广播接收器，防止内存泄漏
-     */
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (networkReceiver != null) {
-            unregisterReceiver(networkReceiver);
         }
     }
 }

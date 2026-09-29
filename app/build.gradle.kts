@@ -1,13 +1,27 @@
+import java.util.Properties
 plugins {
     alias(libs.plugins.android.application)
 }
-
+// 从 local.properties 读取 BASE_URL
+fun getBaseUrl(): String {
+    val properties = Properties()
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        properties.load(localPropertiesFile.inputStream())
+    }
+    val baseUrl = properties.getProperty("BASE_URL") ?: "http://10.0.2.2/"
+    return "\"$baseUrl\""
+}
 android {
     namespace = "com.example.mealdiary"
     compileSdk {
         version = release(36) {
             minorApiLevel = 1
         }
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 
     defaultConfig {
@@ -18,6 +32,9 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // 注入 BASE_URL
+        buildConfigField("String", "BASE_URL", getBaseUrl())
     }
 
     buildTypes {
@@ -33,13 +50,12 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-    configurations {
-        all {
-            exclude(group = "com.android.support", module = "support-v4")
-            exclude(group = "com.android.support", module = "support-compat")
-            exclude(group = "com.android.support", module = "support-core-ui")
-        }
-    }
+}
+
+configurations.all {
+    exclude(group = "com.android.support", module = "support-v4")
+    exclude(group = "com.android.support", module = "support-compat")
+    exclude(group = "com.android.support", module = "support-core-ui")
 }
 
 dependencies {
