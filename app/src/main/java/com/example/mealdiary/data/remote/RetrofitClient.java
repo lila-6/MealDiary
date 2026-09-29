@@ -3,10 +3,9 @@ package com.example.mealdiary.data.remote;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-
 /**
  * Retrofit 网络客户端单例类（多种组件之：网络请求组件）
- *Retrofit 开源库提供的 API 接口
+ * Retrofit 开源库提供的 API 接口
  * 作用：管理与若依后端的 HTTP 通信，提供统一的 API 接口访问入口
  *
  * 使用技术：
@@ -14,9 +13,10 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * - GsonConverterFactory：将 JSON 自动转换为 Java 对象（Map）
  *
  * BASE_URL 说明：
- * - 模拟器调试：使用 10.0.2.2（Android 模拟器访问宿主机的特殊 IP）
- * - 真机演示：使用电脑的局域网 IP（如 192.168.x.x）
- *   手机和电脑需在同一网络（手机开热点让电脑连接，或连同一 WiFi）
+ * - 不硬编码在源码中，通过 BuildConfig.BASE_URL 注入
+ * - 具体值配置在项目根目录 local.properties 的 BASE_URL 字段
+ * - local.properties 已被 .gitignore 忽略，不会提交到 Git
+ * - 切换环境（模拟器 / 真机 / 不同 WiFi）只需改 local.properties，无需改代码
  *
  * 为什么用单例模式：
  * - 整个 App 只需要一个 Retrofit 实例
@@ -27,8 +27,9 @@ public class RetrofitClient {
 
     /**
      * 若依后端的访问地址
-     * - 模拟器：http://10.0.2.2/ (Android 模拟器访问宿主机的特殊 IP)
-     * - 真机：请替换为你电脑的局域网 IP (如 http://192.xxx.x.x/)
+     * 由 build.gradle.kts 通过 buildConfigField 注入
+     * 来源：local.properties 中的 BASE_URL 字段
+     * 例如：BASE_URL=http://192.xxx.xxx.xxx/
      * 注意：必须与若依后端启动端口一致（本项目若依运行在 80 端口）
      */
     private static final String BASE_URL = com.example.mealdiary.BuildConfig.BASE_URL;
